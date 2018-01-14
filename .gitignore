@@ -1,0 +1,11 @@
+*/Build
+*/Binaries
+*/DerivedDataCache
+*/Intermediate
+*/Saved
+BuildingEscape/Content/StarterContent
+
+*.db
+*.xcuserstate
+*.xcworkspacedata
+*.xcsettings
