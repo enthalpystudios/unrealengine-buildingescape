@@ -16,20 +16,23 @@ UOpenDoor::UOpenDoor()
 }
 
 
-void UOpenDoor::OpenDoor() {
-    AActor* Owner = GetOwner();
-    // Create a Rotator
-    FRotator NewRotation = FRotator(0.0f, 60.0f, 0.0f);
-    
-    // Set the door rotation
-    Owner->SetActorRotation(NewRotation);
-    UE_LOG(LogTemp, Warning, TEXT("Rotation is at %s"), *NewRotation.ToString())
+void UOpenDoor::OpenDoor()
+{
+    Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
+}
+
+void UOpenDoor::CloseDoor()
+{
+    Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+    //UE_LOG(LogTemp, Warning, TEXT("Rotation is at %s"), *NewRotation.ToString())
 }
 
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
+    
+    Owner = GetOwner();
 
     ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
@@ -39,11 +42,18 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+    
 	// Pool the trigger volume
     if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
     {
-       OpenDoor();
+        OpenDoor();
+        LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+    }
+    
+    // Check if it's time to close the door
+    if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+    {
+        CloseDoor();
     }
 }
 
